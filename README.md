@@ -6,7 +6,7 @@ and "Lu Liewu, Shen Shizhao, Shen Zuyan, etc. Stability of steel structural memb
 3. Major charactoristics: 
 (1) The programme is coded on MATLAB 2016a and it is suggest to run it on this platform.
 (2) Employing the excel "Sample.xlsx", it is able to estimate a batch of the critical moments of beams, whose dimensions, loadings and boundary conditions vary simultaneously.
-(3) It has great agreement with the result presented by LTBeamN, a widespread FEA programme created by CTICM.  
+(3) It has great agreement with the result presented by LTBeamN, a widespread FEA programme for analysing LTB created by CTICM.  
 
 Contact:
 ylpxdy@163.com
