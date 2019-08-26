@@ -1,0 +1,23 @@
+syms Le z Vy Me1 zp
+Tt = [1 0 0 0; 0 1 0 0; 1 Le Le^2 Le^3; 0 1 2*Le 3*Le^2];
+T = Tt^-1;
+z0 = [1 z z^2 z^3];
+z1 = diff(z0,z,1);
+z2 = diff(z1,z,1);
+N0 = z0 * T;
+N1 = z1 * T;
+N2 = z2 * T;
+Z10 = N1.' * N0;
+Z01 = N0.' * N1;
+Z11 = int(N1.' * N1,z,0,Le);
+Z22 = int(N2.' * N2,z,0,Le);
+Z00 = int(N0.' * N0,z,0,Le);
+Z110 = int(N1.' * N1 * (Vy*z + Me1),z,0,Le);
+Z011 = int(N0.' * N1 * Vy,z,0,Le);
+Z101 = int(N1.' * N0 * Vy,z,0,Le);
+Z00p0 = subs(N0.' * N0,z,0);
+Z00p1 = subs(N0.' * N0,z,Le);
+N0q = int(N0,z,0,Le);
+N0P = subs(N0,z,0);
+Nzp = subs(N0,z,zp);
+NPy = int(N0',z,0,Le) * Nzp;
