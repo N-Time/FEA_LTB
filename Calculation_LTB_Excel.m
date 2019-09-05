@@ -1,6 +1,6 @@
 tic
 %%%%%%%%%%%%% Parallel Setting  %%%%%%%%%%%%%%
-Filename = 'Sample.xlsx';
+Filename = 'C2fin.xlsx';
 Sheet = 1;
 %
 %%%%% Read range %%%%%
@@ -10,20 +10,20 @@ Rh = 'C'; Rtw = 'G'; RbT = 'D'; RtT = 'F'; RbB = 'E'; RtB = 'F';
 % Lengthes
 RL = 'K';
 % Material
-RE = 'H'; Rv = 'I';
+RE = 'H'; Rv = 'J';
 % Load
-% Amp ay 
-RPy = ['AF' 'AD'];
+% Amp [zpy] ay 
+RPy = ['AH' 'AI' 'AD';'AJ' 'AK' 'AE'];
 Rqy = ['' ''];
-RM0 = 'AG';
+RM0 = '';
 
 %%%% Rows----numbers of specimens
 RWstart = '3';
-RWend = '497';
+RWend = '272';
 %
 %%%%% Write Range %%%%%
 %%% Columns
-WMcr = 'AH';
+WMcr = 'AP';
 
 %%%%%%%%%%%%% Input %%%%%%%%%%%%%%
 %%% Origin Input
@@ -50,36 +50,73 @@ uz1 = [0]';
 phiz0 = [0]'; 
 phiz1 = [0]'; 
 % Loads(kN m)[Amplitude(kN m) Distribution(m) ay(mm){up<0, down>0}]: qy Py Mx0
+% The numbers of cases of loads
+Cn = str2double(RWend) - str2double(RWstart) + 1;
 %%%% qy = [Amp  ay] %%%%
+Lqy = cell(Cn,1);
 if isempty(Rqy)
-    qy = zeros(size(E,1),2);  
+    for i = 1 : Cn
+        Lqy{i} = zeros(1,2);
+    end
 else
-    qyAmp = xlsread(Filename,Sheet,[Rqy(1:2),RWstart,':',Rqy(1:2),RWend]);
-    qyay = xlsread(Filename,Sheet,[Rqy(3:4),RWstart,':',Rqy(3:4),RWend]);
-    qy = [qyAmp qyay];
+    Nqy = size(Rqy,1);%Num of loads of each cases
+    LqyAmp = zeros(Nqy,Cn);
+    Laqy = zeros(Nqy,Cn);
+    for i = 1 : Nqy %Num of loads of each groups
+        LqyAmp(i,:) = xlsread(Filename,Sheet,[Rqy(i,1:2),RWstart,':',Rqy(i,1:2),RWend]);
+        Laqy(i,:) = xlsread(Filename,Sheet,[Rqy(i,3:4),RWstart,':',Rqy(i,3:4),RWend]);
+    end
+    for i = 1 : Cn % each loads groups
+        Lqy{i}(:,1) = LpyAmp(:,i);
+        Lqy{i}(:,2) = Lapy(:,i)*1000;
+    end
 end
 %%%% Py = [Amp  z  ay] %%%%
+LPy = cell(Cn,1);
 if isempty(RPy)
-    Py = zeros(size(E,1),3);  
+    for i = 1 : Cn
+        LPy{i} = zeros(1,3);
+    end
 else
-    PyAmp = xlsread(Filename,Sheet,[RPy(1:2),RWstart,':',RPy(1:2),RWend]);
-    Pyz = L./2;
-    Pyay = xlsread(Filename,Sheet,[RPy(3:4),RWstart,':',RPy(3:4),RWend]);
-    Py = [PyAmp Pyz Pyay];
+    NPy = size(RPy,1);%Num of loads of each cases
+    LpyAmp = zeros(NPy,Cn);
+    Lzpy = zeros(NPy,Cn);
+    Lapy = zeros(NPy,Cn);
+    for i = 1 : NPy %Num of loads of each groups
+        LpyAmp(i,:) = xlsread(Filename,Sheet,[RPy(i,1:2),RWstart,':',RPy(i,1:2),RWend]);
+        Lzpy(i,:) = xlsread(Filename,Sheet,[RPy(i,3:4),RWstart,':',RPy(i,3:4),RWend]);
+        Lapy(i,:) = xlsread(Filename,Sheet,[RPy(i,5:6),RWstart,':',RPy(i,5:6),RWend]);
+    end
+    for i = 1 : Cn % each loads groups
+        LPy{i}(:,1) = LpyAmp(:,i);
+        LPy{i}(:,2) = Lzpy(:,i);
+        LPy{i}(:,3) = Lapy(:,i)*1000;
+    end
 end
 %%%% M0 = [Amp  z] %%%%
+LM0 = cell(Cn,1);
 if isempty(RM0)
-    Mx0 = zeros(size(E,1),2);  
+    for i = 1 : Cn
+        LM0{i} = zeros(1,2);
+    end 
 else
-    Mx0Amp = xlsread(Filename,Sheet,[RM0,RWstart,':',RM0,RWend]);
-	Mx0z = L;
-    Mx0 = [Mx0Amp Mx0z];
+    NM0 = size(RM0,1);%Num of loads of each cases
+    LM0Amp = zeros(NM0,Cn);
+    LzM0 = zeros(NM0,Cn);
+    for i = 1 : NM0 %Num of loads of each groups
+        LM0Amp(i,:) = xlsread(Filename,Sheet,[RM0(i,1:2),RWstart,':',RM0(i,1:2),RWend]);
+        LzM0(i,:) = xlsread(Filename,Sheet,[RM0(i,3:4),RWstart,':',RM0(i,3:4),RWend]);
+    end
+    for i = 1 : Cn % each loads groups
+        LM0{i}(:,1) = LM0Amp(:,i);
+        LM0{i}(:,2) = LzM0(:,i);
+    end
 end
 
 %%%%%%%%%%%%% Output %%%%%%%%%%%%%%
-Mcr = zeros(size(E,1),1);
-parfor  i = 1 : 1 : size(E,1) % parallell calculation
-    McrM = FEA_LTB(E(i),vv(i),h(i),tw(i),bT(i),tT(i),bB(i),tB(i),L(i),Nel,vz0,vz1,uz0,uz1,phiz0,phiz1,qy(i,:),Py(i,:),Mx0(i,:));% kN m
+Mcr = zeros(Cn,1);
+parfor  i = 1 : 1 : Cn % parallell calculation
+    McrM = FEA_LTB(E(i),vv(i),h(i),tw(i),bT(i),tT(i),bB(i),tB(i),L(i),Nel,vz0,vz1,uz0,uz1,phiz0,phiz1,Lqy{i},LPy{i},LM0{i});% kN m
     Mcr(i) = abs(McrM(1));
 end
 xlswrite(Filename,Mcr,Sheet,[WMcr,RWstart,':',WMcr,RWend])
