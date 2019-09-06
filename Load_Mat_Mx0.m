@@ -16,7 +16,7 @@ function QM = Load_Mat_Mx0(Mx0,Le,Nnd,NdDOFs)
         Mx0Nd(:,2) = floor(Mx0(:,2)/Le) + 1; % Node Number of Mx0
         for i = 1 : size(Mx0,1)
             QeM = Ele_Stiff_Mat_Mxe(Le,Mx0(i,2)); % Element Matrix of Mx0
-            QM = Load_Mat_Assemble_Concentrate(i,Nnd,NdDOFs,Mx0,Mx0Nd,QeM,QM);
+            QM = Load_Mat_Assemble_Concentrate(Nnd,NdDOFs,Mx0Nd(i,:),QeM) + QM;
         end
     end
 end
