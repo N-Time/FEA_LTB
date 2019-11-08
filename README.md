@@ -9,4 +9,4 @@ and "Lu Liewu, Shen Shizhao, Shen Zuyan, etc. Stability of steel structural memb
 (3) It has great agreement with the result presented by LTBeamN, a widespread FEA programme for analysing LTB created by CTICM.  
 
 Contact:
-ylpxdy@163.com
+wentx17@lzu.edu.cn
